@@ -8,8 +8,8 @@ const config: Config = {
   tagline: 'Workflow-first language, Hya framework, and package ecosystem documentation',
   favicon: 'img/favicon.ico',
   future: {v4: true},
-  url: 'https://detian.example.com',
-  baseUrl: '/',
+  url: 'https://detian-lang.github.io',
+  baseUrl: '/detian-wiki-pre/',
   onBrokenLinks: 'warn',
   markdown: {
     hooks: {
