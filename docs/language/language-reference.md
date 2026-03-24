@@ -110,7 +110,10 @@ group#jobs {
 - `items[start:]`
 - `items[:end]`
 - `items[:]`
+- `items[start:end:step]`
+- `items[::step]`
 - current support covers lists, strings, and bytes
+- `step` must currently be a positive integer
 - single index access can use `items[idx]`; strings return a one-character string and bytes return an integer byte
 - negative indices count from the end
 - `get(list, idx)` remains valid for explicit builtin-style list/bytes access

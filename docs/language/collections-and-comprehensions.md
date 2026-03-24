@@ -44,6 +44,7 @@ var#mid = items[1:4];
 var#tail = items[2:];
 var#head = items[:2];
 var#all = items[:];
+var#odds = items[::2];
 ```
 
 Rules:
@@ -54,8 +55,10 @@ Rules:
 - omitted `start` defaults to `0`
 - omitted `end` defaults to `len(list)`
 - out-of-range bounds are clamped
+- optional positive `step` is supported: `items[start:end:step]` or `items[::step]`
 - negative bounds count from the end (`-1` means the last element)
 - `start > end` returns `[]`
+- `step` must currently be a positive integer
 - single index bracket access is also available: `items[idx]`
 - strings return a single-character string on index access
 - bytes return an integer byte on index access
