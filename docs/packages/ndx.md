@@ -89,6 +89,22 @@ print(json_stringify({
 }));
 ```
 
+## Example: multi-axis matrix access
+
+```detian
+load "ndx" as ndx;
+
+var#matrix = ndx.matrix.from_rows(
+  [[1.0, 10.0], [2.0, 20.0], [3.0, 30.0]],
+  ["score", "visits"]
+);
+
+var#scalar = matrix[1, 1];
+var#row = matrix[1, :];
+var#col = matrix[:, 1];
+var#block = matrix[0:2, 1:2];
+```
+
 ## Full example in this repo
 
 ```bash
@@ -131,6 +147,64 @@ Implementation note: helper groups with `_internal` in the source are runtime pl
 - `mean_axis0(var#matrix)`
 - `stddev_axis0(var#matrix)`
 - `minmax_axis0(var#matrix)`
+
+## Tensor contract
+
+Dense tensors use an explicit record shape:
+
+```detian
+{
+  values: [1.0, 2.0, 3.0, 4.0],
+  shape: [2, 2]
+}
+```
+
+## Example: tensor metadata and indexing
+
+```detian
+load "ndx" as ndx;
+
+var#tensor = ndx.tensor.from_rows([[1.0, 2.0], [3.0, 4.0]]);
+var#shape = ndx.tensor.shape(tensor);
+var#ndim = ndx.tensor.ndim(tensor);
+var#size = ndx.tensor.size(tensor);
+var#value = ndx.tensor.get(tensor, [1, 1]);
+var#reshaped = ndx.tensor.reshape(tensor, [4]);
+```
+
+### `tensor.det` → group `tensor`
+
+- `from_flat(var#values, var#shape)`
+- `zeros(var#shape)`
+- `full(var#shape, var#value)`
+- `shape(var#tensor)`
+- `ndim(var#tensor)`
+- `size(var#tensor)`
+- `reshape(var#tensor, var#shape)`
+- `get(var#tensor, var#indices)`
+- `from_rows(var#rows)`
+- `to_rows(var#tensor)`
+
+## Example: tensor multi-axis access
+
+```detian
+load "ndx" as ndx;
+
+var#tensor_cube = ndx.tensor.from_flat([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2]);
+var#scalar = tensor_cube[1, 0, 1];
+var#face = tensor_cube[:, :, 1];
+```
+
+## Ellipsis
+
+```detian
+load "ndx" as ndx;
+
+var#tensor_cube = ndx.tensor.from_flat([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2]);
+var#face = tensor_cube[..., 0];
+```
+
+At most one ellipsis is allowed. It expands to enough full-axis selectors to match the tensor rank.
 
 ## Relation to other packages
 

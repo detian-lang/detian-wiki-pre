@@ -104,6 +104,14 @@ group#jobs {
 - `some for ...`
 - `every for ...`
 
+## Recurrence sequence literals
+
+- `[1, 2, ($ * 2 + 1)..., 100]`
+- requires at least two seed values
+- `$` means the previously emitted value
+- current support covers `int`, `float`, and `duration`
+- `reclist([1, 1, ($[-1] + $[-2])..., 100])` enables indexed history access
+
 ## List slicing
 
 - `items[start:end]`
@@ -113,10 +121,20 @@ group#jobs {
 - `items[start:end:step]`
 - `items[::step]`
 - current support covers lists, strings, and bytes
-- `step` must currently be a positive integer
+- `step` must currently be a non-zero integer; negative step reverses direction
 - single index access can use `items[idx]`; strings return a one-character string and bytes return an integer byte
 - negative indices count from the end
 - `get(list, idx)` remains valid for explicit builtin-style list/bytes access
+
+## Multi-axis access
+
+- `items[row, col]`
+- `items[row, :]`
+- `items[:, col]`
+- `items[row_start:row_end, col_start:col_end]`
+- current support is 2-selector only
+- raw nested lists and `ndx.matrix` records are supported
+- `ndx.tensor` supports rank-matching selectors and a single ellipsis such as `tensor[..., 0]`
 
 ## Hya/HYX-related surfaces
 

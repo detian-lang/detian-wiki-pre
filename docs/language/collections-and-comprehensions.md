@@ -55,12 +55,54 @@ Rules:
 - omitted `start` defaults to `0`
 - omitted `end` defaults to `len(list)`
 - out-of-range bounds are clamped
-- optional positive `step` is supported: `items[start:end:step]` or `items[::step]`
+- `step` is supported: `items[start:end:step]` or `items[::step]`
 - negative bounds count from the end (`-1` means the last element)
 - `start > end` returns `[]`
-- `step` must currently be a positive integer
+- `step` must currently be a non-zero integer; negative step reverses direction
 - single index bracket access is also available: `items[idx]`
 - strings return a single-character string on index access
 - bytes return an integer byte on index access
 - negative indices count from the end for lists, strings, and bytes
 - `get(list, idx)` remains valid when you want the explicit builtin form for lists/bytes
+
+
+## Multi-axis access
+
+```detian
+var#rows = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9]
+];
+
+var#cell = rows[1, 2];
+var#row = rows[1, :];
+var#col = rows[:, 1];
+var#block = rows[0:2, 1:3];
+```
+
+Rules:
+
+- current multi-axis support accepts exactly 2 selectors
+- raw nested lists and `ndx.matrix` records are supported
+- index + index returns a scalar
+- index + slice or slice + index returns a 1D list
+- slice + slice returns a 2D result
+
+
+## Recurrence sequence literals
+
+```detian
+var#ints = [1, 2, ($ * 2 + 1)..., 100];
+var#floats = [2.0, 4.0, ($ + 3.0)..., 20.0];
+var#times = [100ms, 200ms, ($ + 150ms)..., 1s];
+```
+
+Rules:
+
+- requires at least two seed values
+- `$` means the previously emitted value
+- current support covers `int`, `float`, and `duration`
+- recurrence direction is inferred from the first generated value
+- history/index access like `$[0]` is not supported in plain recurrence literals
+- for advanced history-based recurrence, use `reclist([1, 1, ($[-1] + $[-2])..., 100])`

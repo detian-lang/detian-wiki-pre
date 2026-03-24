@@ -28,6 +28,7 @@ const sidebars: SidebarsConfig = {
         'language/records-maps-json-and-bytes',
         'language/expressions-operators-and-control',
         'language/collections-and-comprehensions',
+        'language/advanced-lists-and-sequences',
         'language/error-result-and-diagnostics',
         'language/stdlib-builtin-and-hya',
         'language/modules-and-capabilities',
