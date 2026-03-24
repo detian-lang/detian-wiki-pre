@@ -1,0 +1,6 @@
+{
+  "label": "Tooling",
+  "position": 1,
+  "collapsed": false,
+  "description": "CLI, LSP, diagnostics, testing, and developer workflows."
+}

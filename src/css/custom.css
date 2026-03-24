@@ -1,0 +1,17 @@
+
+:root {
+  --ifm-color-primary: #2563eb;
+  --ifm-color-primary-dark: #1d4ed8;
+  --ifm-color-primary-darker: #1e40af;
+  --ifm-color-primary-light: #3b82f6;
+  --ifm-color-primary-lighter: #60a5fa;
+  --ifm-code-font-size: 95%;
+}
+
+.markdown h1, .markdown h2, .markdown h3 {
+  scroll-margin-top: 5rem;
+}
+
+a.card {
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}

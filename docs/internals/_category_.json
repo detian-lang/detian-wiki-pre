@@ -1,0 +1,6 @@
+{
+  "label": "Internals",
+  "position": 1,
+  "collapsed": false,
+  "description": "Architecture, roadmap, runtime direction, and implementation planning."
+}
