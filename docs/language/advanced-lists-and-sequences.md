@@ -7,10 +7,13 @@ description: Advanced indexing, slicing, multi-axis access, and recurrence list 
 
 This page collects the more advanced list and sequence surfaces in one place:
 
+Resolver note: literal-only index/slice forms may be folded during the resolver pass before runtime.
+
 - list/string/bytes indexing
 - slicing with steps and negative indices
 - multi-axis access on nested lists, `ndx.matrix`, and `ndx.tensor`
 - recurrence sequence literals and `reclist(...)`
+- pure list helper builtins such as `list.push(...)` and `list.pop(...)`
 
 ## 1. Index access
 
@@ -114,7 +117,59 @@ Current rules:
 - mixed index/slice usually returns a 1D result
 - slice-based multi-axis selection returns a 2D/n-D structured result
 
-## 4. Sequence literals
+## 4. Indexed, stepped slice, and multi-axis assignment
+
+```detian
+var#items = [10, 20, 30];
+items[1] = 99;
+items[-1] = 77;
+items[0:3:2] = [5, 6];
+
+var#user = { items: [{ field: "a" }, { field: "b" }] };
+user.items[1].field = "updated";
+
+var#matrix = [[1, 2], [3, 4]];
+matrix[1, 0] = 99;
+```
+
+Rules:
+
+- direct list variables and simple field-path list targets are supported
+- index must resolve to an integer
+- negative indices count from the end
+- out-of-range indices are errors
+- slice replacement value must be a list
+- stepped slice assignment is allowed when the replacement length matches the number of selected slots
+- multi-axis assignment currently supports only integer indices and 2D nested-list / `ndx.matrix` targets
+
+## 5. Pure list helper builtins
+
+```detian
+var#items = [1, 2, 3];
+items = list.push(items, 4);
+items = list.prepend(items, 0);
+items = list.set(items, -1, 99);
+items = list.insert(items, 1, 42);
+items = list.remove_at(items, 0);
+var#out = list.pop(items);
+var#first = list.first(items);
+var#last = list.last(items);
+items = list.extend(items, [7, 8]);
+var#mid = list.pop_at(items, -2);
+var#front = list.pop_front(items);
+```
+
+Rules:
+
+- these helpers return new lists rather than mutating in place
+- `list.set` and `list.remove_at` support negative indices
+- `list.insert` currently accepts indices in `0..=len(list)`
+- `list.pop`, `list.pop_at`, and `list.pop_front` return a record with `list` and `value` fields
+- `list.first` / `list.last` return the boundary item or `null` for an empty list
+- `list.extend` appends another list and returns a new list
+- `std.list.*` aliases are available
+
+## 6. Sequence literals
 
 ### Inferred arithmetic/geometric sequence literals
 
@@ -141,7 +196,7 @@ Rules:
 - recurrence direction is inferred from the first generated value
 - plain recurrence literals do not support `$[...]`
 
-## 5. Advanced recurrence with `reclist(...)`
+## 7. Advanced recurrence with `reclist(...)`
 
 ```detian
 reclist([1, 1, ($[-1] + $[-2])..., 100])
@@ -156,7 +211,7 @@ Rules:
 - history indices must currently be integer literals
 - the recurrence sees a history snapshot for the current step
 
-## 6. Practical guidance
+## 8. Practical guidance
 
 Use this page when you are doing data-heavy or numeric work and want the shortest reference for Detian's most advanced sequence/list capabilities.
 

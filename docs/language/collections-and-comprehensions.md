@@ -89,6 +89,59 @@ Rules:
 - index + slice or slice + index returns a 1D list
 - slice + slice returns a 2D result
 
+## Indexed, stepped slice, and multi-axis assignment
+
+```detian
+var#items = [10, 20, 30];
+items[1] = 99;
+items[-1] = 77;
+items[0:3:2] = [5, 6];
+
+var#user = { items: [{ field: "a" }, { field: "b" }] };
+user.items[1].field = "updated";
+
+var#matrix = [[1, 2], [3, 4]];
+matrix[1, 0] = 99;
+```
+
+Rules:
+
+- direct list variables and simple field-path list targets are supported
+- index must resolve to an integer
+- negative indices count from the end
+- out-of-range indices are errors
+- slice replacement value must be a list
+- stepped slice assignment is allowed when the replacement length matches the number of selected slots
+- multi-axis assignment currently supports only integer indices and 2D nested-list / `ndx.matrix` targets
+
+## Pure list helper builtins
+
+```detian
+var#items = [1, 2, 3];
+items = list.push(items, 4);
+items = list.prepend(items, 0);
+items = list.set(items, -1, 99);
+items = list.insert(items, 1, 42);
+items = list.remove_at(items, 0);
+var#out = list.pop(items);
+var#first = list.first(items);
+var#last = list.last(items);
+items = list.extend(items, [7, 8]);
+var#mid = list.pop_at(items, -2);
+var#front = list.pop_front(items);
+```
+
+Rules:
+
+- these helpers return new lists rather than mutating in place
+- `list.set` and `list.remove_at` support negative indices
+- `list.insert` currently expects an index in `0..=len(list)`
+- `list.pop`, `list.pop_at`, and `list.pop_front` return a record with `list` and `value` fields
+- `list.first` / `list.last` return the boundary item or `null` for an empty list
+- `list.extend` appends another list and returns a new list
+- `std.list.*` aliases are available
+
+
 
 ## Recurrence sequence literals
 

@@ -125,6 +125,16 @@ group#jobs {
 - single index access can use `items[idx]`; strings return a one-character string and bytes return an integer byte
 - negative indices count from the end
 - `get(list, idx)` remains valid for explicit builtin-style list/bytes access
+- pure list helpers: `list.push`, `list.prepend`, `list.set`, `list.insert`, `list.remove_at`, `list.first`, `list.last`, `list.pop`, `list.extend`, `list.pop_at`, `list.pop_front` (`std.list.*` aliases too)
+- indexed list assignment: `items[idx] = value`, `user.items[idx] = value`, `user.items[idx].field = value`
+- slice list assignment: `items[a:b] = replacement_list` and `items[a:b:step] = replacement_list`
+- multi-axis assignment: `matrix[i, j] = value` for raw nested lists / `ndx.matrix`
+
+## Front-end preprocessing
+
+- HYX blocks are preprocessed/lowered before parsing
+- resolver/linking rewrites known builtin and thread calls
+- literal-only arithmetic / conditional / index / slice expressions are constant-folded before runtime
 
 ## Multi-axis access
 
