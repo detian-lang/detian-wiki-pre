@@ -11,6 +11,12 @@ description: The Detian CLI surface for running programs, package workflows, and
 cargo run -- path/to/file.det
 ```
 
+You can also run the built binary directly:
+
+```bash
+./target/debug/detian1 path/to/file.det
+```
+
 ## Run a package root
 
 ```bash
@@ -22,6 +28,29 @@ cargo run -- examples/foundation_stack_demo
 ```bash
 cargo run -- lsp
 ```
+
+## Hya development loop
+
+There is now a minimal Hya dev supervisor:
+
+```bash
+cargo run -- dev examples/hya_server.det
+```
+
+or:
+
+```bash
+./target/debug/detian1 dev examples/hya_server.det
+```
+
+Current behavior:
+
+- watches Detian source plus common asset files
+- restarts the child Detian process on change
+- enables `GET /__hya/dev/version`
+- injects a browser-side full reload script through `hya.page(...)`
+
+This is **full-page hot reload**, not HMR.
 
 ## Package commands
 
@@ -38,5 +67,6 @@ When documenting or teaching Detian, always distinguish between:
 
 - running a plain source file
 - running a package root
+- running the Hya dev supervisor
 - using package-management subcommands
 - running the LSP

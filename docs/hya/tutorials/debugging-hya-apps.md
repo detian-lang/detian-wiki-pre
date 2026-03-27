@@ -110,10 +110,28 @@ Common examples include:
 - `complex_state_if`
 - `complex_state_each`
 - `complex_state_attr_expr`
+- `state_each_requires_keyed_root`
+- `state_each_text_expr_must_reference_loop_item_path`
 
 That means the question is not just “did it work?” but also “did it stay on the expected render path?”
 
 If not, diagnostics often explain why.
+
+## Debug the dev loop too
+
+Hya now has a minimal hot-reload loop through:
+
+```bash
+detian dev examples/hya_server.det
+```
+
+When you use that mode, check three things:
+
+1. the terminal shows the listening URL and route list
+2. the page can fetch `GET /__hya/dev/version`
+3. file edits actually bump the version and trigger a browser reload
+
+Remember that this is **full-page reload**, not HMR. So if state disappears after reload, that is expected today.
 
 ## A practical debugging ladder
 

@@ -38,7 +38,60 @@ Hya works well in Detian because the language already has explicit execution str
 - HYX authoring
 - fine-grained reactivity
 - optimistic fine actions
+- hot reload and dev workflow
 - diagnostics and devtools
+
+## Current fine-grained scope
+
+Today Hya's fine-grained path is opt-in through `hya.mount_fine(...)`, and it already covers:
+
+- text bindings
+- attr / class / style bindings
+- conditional branch bindings
+- keyed text lists through `hya.state_each_text(...)`
+- keyed HTML fragment rows through `hya.state_each_view(...)`
+- action patch responses and the first optimistic-patch slice
+- browser-side devtools hooks through `window.__hyaFine.*`
+
+That means Hya is already beyond "SSR plus full rerender only" for a meaningful safe subset.
+
+## HYX and fine-grained lowering today
+
+HYX already lowers several safe state-driven patterns automatically:
+
+- `{props.state.value.count}` → `hya.state_text(...)`
+- `class={props.state.value.variant}` / `style={props.state.value.accent}` / `disabled={props.state.value.busy}`
+- `if (props.state.value.busy) { ... } else { ... }` → `hya.state_when(...)`
+- keyed loops such as:
+  - `for item in props.state.value.items { <li key={item.id}>{item.name}</li> }`
+  - `for item in props.state.value.items { <MetricCard key={item.id} metric={item} /> }`
+  - `for item, idx in props.state.value.items { <li key={item.id}>{item.name + "-" + str(idx)}</li> }`
+
+When HYX cannot stay on the fine path, Hya records a fallback reason in `data-hya-fine-diagnostics`, for example:
+
+- `complex_state_text_expr`
+- `complex_state_attr_expr`
+- `state_each_requires_keyed_root`
+
+## Dev loop today
+
+Hya now has a minimal hot-reload loop through:
+
+```bash
+detian dev examples/hya_server.det
+```
+
+Current behavior:
+
+- the CLI watches source and asset files
+- the child Detian process restarts
+- `hya.page(...)` injects a small dev reload script
+- the browser polls `GET /__hya/dev/version`
+- version changes trigger a full page reload
+
+So this is **full-page hot reload, not HMR**.
+
+The terminal also shows the listening URL, route list, and action endpoint so a Hya server does not start silently.
 
 ## Good next pages
 

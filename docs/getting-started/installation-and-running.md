@@ -55,6 +55,22 @@ cargo run -- examples/launchpad_crm
 cargo run -- lsp
 ```
 
+## Minimal Hya dev loop
+
+If you are working on a Hya app, there is now a minimal dev supervisor:
+
+```bash
+cargo run -- dev examples/hya_server.det
+```
+
+Current behavior:
+
+- watches source and common asset files
+- restarts the child Detian process on change
+- enables browser full reload through `GET /__hya/dev/version`
+
+This is intentionally **full-page hot reload**, not HMR.
+
 The current LSP is stdio-based. It already supports diagnostics, document symbols, hover, definition, completion, and references.
 
 ## Common test commands
@@ -103,12 +119,12 @@ A practical first session looks like this:
 ```bash
 cargo build --release
 cargo run -- examples/ultimate_showcase.det
-cargo run -- examples/hya_server.det
+cargo run -- dev examples/hya_server.det
 cargo run -- lsp
 ```
 
 That gives you:
 
 - the language overview
-- a Hya baseline
+- a Hya baseline with the current dev loop
 - the editor/tooling side
