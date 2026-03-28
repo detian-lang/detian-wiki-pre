@@ -7,6 +7,54 @@ description: Build pages, routes, stateful components, actions, and fine-grained
 
 Build pages, routes, stateful components, actions, and fine-grained hydrated UIs.
 
+## Recommended surface
+
+At this point, **HYX is the preferred authoring surface** for most page/component code, while the flat API stays available as an escape hatch when you need very explicit helper control or you are comparing lowering behavior directly.
+
+### HYX-first quickstart
+
+```detian
+load "hya" as hya;
+
+group#components {
+  thread#counter(map#props) {
+    return hyx {
+      <section class="card">
+        <h1>{state.label}</h1>
+        <button class={state.variant} disabled={state.busy}>
+          {state.count}
+        </button>
+        if (state.busy) {
+          <p>{"Busy"}</p>
+        } else {
+          <p>{"Ready"}</p>
+        }
+      </section>
+    };
+  }
+}
+
+var#state = hya.state({
+  count: 1,
+  label: "Counter",
+  variant: "primary",
+  busy: false
+});
+var#view = hya.mount_fine("components.counter", { state: state });
+return hya.html(hya.page("Counter", [view]));
+```
+
+### Flat API escape hatch
+
+```detian
+load "hya" as hya;
+
+var#state = hya.state({ count: 1, label: "Counter" });
+var#next = hya.dispatch("actions.increment", state, { delta: 1 });
+var#view = hya.mount("components.counter", { state: next });
+return hya.html(hya.page("Counter", [view]));
+```
+
 `hya.state.patch(...)` is available as a small write-side helper for action threads that want to return only changed fields and let `hya.dispatch(...)` merge them back into the current state.
 
 Nested map/record patches are merged recursively, so a payload like `{ user: { busy: false } }` keeps sibling fields such as `user.name` intact.
@@ -122,7 +170,7 @@ load "hya" as hya;
 - `style(str#css)`
 - `stylesheet(str#href)`
 
-Current implicit-state MVP work is diagnostics-first. Plain HYX expressions such as `{count}`, `if (busy) { ... }`, `class={variant}`, `style={accent}`, and `disabled={busy}` are still legacy fallbacks today, but they now surface explicit fine-diagnostics reasons (`implicit_state_text_candidate`, `implicit_state_if_candidate`, `implicit_state_class_candidate`, `implicit_state_style_candidate`, `implicit_state_attr_candidate`) so future automatic lowering has a stable breadcrumb.
+Current implicit-state MVP work is diagnostics-first. Plain HYX expressions such as `{count}`, `if (busy) { ... }`, `class={variant}`, `style={accent}`, and `disabled={busy}` are still legacy fallbacks today, but they now surface explicit fine-diagnostics reasons (`implicit_state_text_candidate`, `implicit_state_if_candidate`, `implicit_state_class_candidate`, `implicit_state_style_candidate`, `implicit_state_attr_candidate`) plus a `hint` so future automatic lowering has a stable breadcrumb and an actionable next step.
 
 There is now one real automatic lowering path on top of those diagnostics: if a thread/component binds a simple local directly from `props.state.value.*` before the `hyx { ... }` block, HYX can reuse that alias for simple text and conditional lowering.
 
@@ -137,6 +185,34 @@ Nested alias chains are also supported inside the same narrow model. For example
 HYX-local `let` aliases use the same scope machinery. In practice that means `let state = props.state.value; let user = state.user;` inside a `hyx { ... }` block can still drive the same implicit text/conditional/attribute/keyed-loop lowering path.
 
 A plain state-holder alias works too: `var#state = props.state;` or `let state = props.state;` can still lower once the actual render expressions continue through `state.value.*`.
+
+HYX now also seeds a default `state` alias for component-style threads that take `props` and do not already bind a local `state`. That means common patterns like:
+
+```detian
+thread#profile(map#props) {
+  return hyx {
+    <button class={state.variant} disabled={state.busy}>
+      {state.name}
+    </button>
+    if (state.busy) {
+      <span>{"Busy"}</span>
+    }
+    <ul>
+      for item in state.items {
+        <li key={item.id}>{item.label}</li>
+      }
+    </ul>
+  };
+}
+```
+
+can lower without the extra `var#state = props.state.value;` boilerplate. If the surrounding thread already binds a local `state`, HYX keeps that explicit binding and does not inject the default alias.
+
+HYX `if` chains are a bit nicer now too: `else if (...) { ... }` parses directly, so nested conditional branches no longer require manual nesting to stay on the optimized path.
+
+Runtime parity tests now lock a few representative surfaces too: common text/if/attr/class/style bindings, keyed text lists, keyed view rows, and keyed component loops must render the same fine-grained HTML contract from HYX as from the equivalent flat API helpers.
+
+In particular, keyed `state_each_view`-style templates and keyed component loops are now locked to deterministic lowering: if the keyed row shape is supported, they stay off the legacy diagnostic path instead of emitting noisy implicit-state candidate fallbacks.
 
 ### `response.det` → group `response`
 
