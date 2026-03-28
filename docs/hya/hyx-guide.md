@@ -32,6 +32,22 @@ var#view = hyx {
 };
 ```
 
+In component-style threads that take `props`, HYX also seeds a default `state` alias now, so this is usually the more idiomatic form:
+
+```detian
+thread#status(map#props) {
+  return hyx {
+    if (state.busy) {
+      <p class="busy">Busy</p>
+    } else if (state.done) {
+      <p class="done">Done</p>
+    } else {
+      <p>Ready</p>
+    }
+  };
+}
+```
+
 ## Fine-grained lowering
 
 HYX now performs conservative fine-grained lowering for obvious state-path patterns. If a pattern is too complex or ambiguous, it falls back to the legacy render path and can emit diagnostics for inspection.

@@ -38,15 +38,16 @@ This is one of Hya’s nicest design choices: action handlers are not hidden red
 
 ## Step 2: define the component
 
+Use HYX first for the component surface:
+
 ```detian
 group#components {
   thread#counter(map#props) {
-    return hya.element("button", {
-      class: "action-btn primary",
-      on_click: hya.action("actions.increment", { delta: 1 })
-    }, [
-      hya.text(props.state.value.label + ": " + str(props.state.value.count))
-    ]);
+    return hyx {
+      <button class="action-btn primary" on_click={hya.action("actions.increment", { delta: 1 })}>
+        {state.label}: {state.count}
+      </button>
+    };
   }
 }
 ```
@@ -54,8 +55,19 @@ group#components {
 There are three important ideas here:
 
 1. The component receives `props`, not magical local state.
-2. `props.state.value` contains the current plain state payload.
+2. `state.*` is the current state payload through HYX’s default alias.
 3. `hya.action(...)` does **not** run the action immediately. It creates an action descriptor that the runtime bridge uses when the click happens.
+
+If you need to inspect the exact helper-level lowering, the flat equivalent is still:
+
+```detian
+return hya.element("button", {
+  class: "action-btn primary",
+  on_click: hya.action("actions.increment", { delta: 1 })
+}, [
+  hya.text(props.state.value.label + ": " + str(props.state.value.count))
+]);
+```
 
 ## Step 3: initialize state in the page handler
 
@@ -93,6 +105,8 @@ That is the same shape you learned in the previous page. Interactivity does not 
 
 ## Full example
 
+Here is the same counter in the current HYX-first style:
+
 ```detian
 load "hya" as hya;
 
@@ -107,12 +121,11 @@ group#actions {
 
 group#components {
   thread#counter(map#props) {
-    return hya.element("button", {
-      class: "action-btn primary",
-      on_click: hya.action("actions.increment", { delta: 1 })
-    }, [
-      hya.text(props.state.value.label + ": " + str(props.state.value.count))
-    ]);
+    return hyx {
+      <button class="action-btn primary" on_click={hya.action("actions.increment", { delta: 1 })}>
+        {state.label}: {state.count}
+      </button>
+    };
   }
 }
 
@@ -192,6 +205,8 @@ hya.html(...)
 ```
 
 They map to the same underlying pieces, but the flat surface is easier to teach.
+
+Historically that was true. The current direction is to **teach HYX first** for ordinary component/page authoring, and keep the flat API around as the explicit escape hatch when you need to reason about exact lowering behavior.
 
 ## Common beginner mistakes
 

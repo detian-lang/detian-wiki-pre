@@ -66,26 +66,52 @@ If you do not, start with these docs first:
 
 ## A note on style
 
-The tutorial series deliberately prefers the **flat Hya surface** when possible:
+The tutorial series now prefers a **HYX-first surface** for most page/component authoring, while still using the flat Hya API as an escape hatch when exact helper control makes the example clearer.
+
+HYX-first examples now look like this:
 
 ```detian
 load "hya" as hya;
 
-var#state = hya.state({ count: 1 });
+group#components {
+  thread#counter(map#props) {
+    return hyx {
+      <section class="card">
+        <h1>{state.label}</h1>
+        <button class={state.variant} disabled={state.busy}>
+          {state.count}
+        </button>
+      </section>
+    };
+  }
+}
+
+var#state = hya.state({
+  count: 1,
+  label: "Counter",
+  variant: "primary",
+  busy: false
+});
+var#view = hya.mount_fine("components.counter", { state: state });
+return hya.html(hya.page("Counter", [view]));
+```
+
+The flat API is still important, but mainly as a lower-level comparison/debugging surface:
+
+```detian
+var#state = hya.state({ count: 1, label: "Counter" });
 var#view = hya.mount("components.counter", { state: state });
 return hya.html(hya.page("Counter", [view]));
 ```
 
-You will still see nested surfaces in some examples from the repository, especially older ones such as `hya.html.element(...)` or `hya.response.html(...)`. They are valid, but the flat API is easier to teach, easier to scan, and closer to the current recommended style.
+## HYX first, plain Hya when you need the escape hatch
 
-## Plain Hya first, HYX when it helps
+We still use both styles:
 
-We will use both styles:
+- **HYX** for the primary authoring path
+- **plain Hya** when the tutorial needs to expose exact helper-level behavior
 
-- **plain Hya** to keep the control flow visible
-- **HYX** when the page structure becomes noisy enough that HTML-like authoring helps more than it hurts
-
-That is another deliberate teaching choice. HYX is great, but it is much easier to appreciate once you understand what it lowers into.
+That is the current teaching choice because HYX now covers a much larger part of the fine-lowering surface without hiding the server-first model.
 
 ## Fine-grained rendering in this series
 

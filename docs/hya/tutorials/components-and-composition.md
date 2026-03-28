@@ -72,9 +72,12 @@ A good Hya split is:
 
 That is very close to how the `launchpad_crm` example is organized. It scales well because every layer has a clear job.
 
-## Plain Hya versus HYX
+## HYX versus plain Hya
 
-Hya gives you two broad rendering styles.
+Hya gives you two broad rendering styles, but the default recommendation is now:
+
+- **HYX first** for most component/page authoring
+- **plain Hya** when you need exact helper-level control
 
 ### Plain Hya
 
@@ -96,7 +99,7 @@ return hyx {
 };
 ```
 
-Both are valid. The choice is about readability, not framework correctness.
+Both are valid. The choice is about readability and control, not framework correctness.
 
 ## When to keep plain Hya
 
@@ -107,9 +110,9 @@ Plain Hya is often better when:
 - you are building helpers that generate nodes programmatically
 - you want to avoid any uncertainty about HYX lowering
 
-It is also a great teaching surface because every node is explicit.
+It is also the best escape hatch when you want to compare HYX lowering against the explicit flat helpers one-to-one.
 
-## When HYX becomes the better surface
+## When HYX should be the default surface
 
 HYX helps when:
 
@@ -118,7 +121,7 @@ HYX helps when:
 - readability matters more than seeing every node constructor directly
 - you want JSX-like authoring without losing Detian semantics
 
-The `examples/hya_package_app` example shows this nicely. It mixes component threads and HYX to keep the page structure easy to scan.
+At this point, that covers most ordinary component/page code. The `examples/hya_package_app` example shows this nicely. It mixes component threads and HYX to keep the page structure easy to scan.
 
 ## Component naming and PascalCase mapping
 
