@@ -19,7 +19,30 @@ The client fine runtime now uses `state_patch` to narrow which binding signals a
 
 Those responses also include `state_patch_paths`, and the fine client runtime now prefers those explicit paths when refreshing signals.
 
+Fine action responses now also include `state_patch_ops` as a richer backward-compatible transport contract. The current slice emits:
+
+- exact `set` ops for paths that can be resolved precisely (for example `user.busy`, `items.0`, `items.1.score`)
+- structural list ops (`insert`, `remove`, `replace`, `splice`) for slice-style updates
+- reorder-aware list ops (`reorder`) when a slice keeps the same keyed items but changes their order
+- exact `set` ops for structured matrix/tensor assignments when a mixed index+slice update still resolves to exact logical cells
+
+while preserving `state_patch` and `state_patch_paths`.
+
 The client runtime also tracks versioned path cells internally, and `window.__hyaFine.inspect(...)` / `inspectAll()` now expose a `cells` snapshot for debugging path-level invalidation.
+
+Those inspection hooks now also expose a `dependencies` snapshot so you can see which fine render bindings currently subscribe to which path cells. Patch logs also record `refreshed_cells`, the dependency snapshot, and the current cell versions after targeted reconciliation.
+
+Optimistic patches and reverts now use that same path-aware invalidation metadata too, so rollback paths can stay narrow instead of refreshing unrelated bindings.
+
+Exact patch leaf values are now bridged into the client path-cell runtime directly. When a patch carries an exact leaf such as `count` or `items.1.score`, the runtime can refresh that cell from the patch payload itself instead of re-reading the whole state tree for that path.
+
+When `state_patch_ops` is present, the fine client runtime prefers those exact ops first and only falls back to `state_patch` / state reads for the remaining indirectly affected paths.
+
+Structural list ops also carry `state_patch_regions` so tooling and the client runtime can keep track of which list region changed, not just which leaf paths were touched.
+
+Structured matrix/tensor updates now keep exact touched cell paths too (for example `matrix.1.0`, `matrix.1.1`, `tensor.0.1`, `tensor.1.1`), which lets the client runtime avoid over-invalidating unrelated rows or axes when exact scope is known.
+
+The fine devtools surface now also exposes a small `cell_model` contract that documents the current hidden runtime (`path-cell`, versioned, path-aware, exact-patch bridge, explicit-state compatible). Patch logs distinguish `exact_patch_cells` from `fallback_cells`, so opaque or indirectly affected bindings still have an explicit fallback path you can inspect.
 
 For fixed-length slice replacements, those paths are now more precise (for example `items.0`, `items.1` instead of just `items`). Exact multi-index updates keep exact paths such as `matrix.1.0`.
 
