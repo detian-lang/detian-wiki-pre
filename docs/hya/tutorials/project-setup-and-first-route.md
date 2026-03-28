@@ -38,7 +38,7 @@ load "hya" as hya;
 require env.read;
 ```
 
-That gives you the flat API under the `hya` alias. We recommend this style throughout the tutorial because it keeps examples shorter and more readable.
+That gives you the Hya surface under the `hya` alias. The current tutorial direction is **HYX first for ordinary page/component authoring**, with the flat API kept around as an explicit escape hatch when exact helper control matters more than readability.
 
 ## Step 3: write a page handler
 
@@ -47,12 +47,13 @@ The first real Hya unit is a page handler thread. Put it in a `pages` group:
 ```detian
 group#pages {
   thread#home(map#ctx) {
-    return hya.html(hya.page("Hello Hya", [
-      hya.element("main", { class: "page" }, [
-        hya.element("h1", {}, [hya.text("Hello from Hya")]),
-        hya.element("p", {}, [hya.text("This page was rendered on the server.")])
-      ])
-    ]));
+    var#body = hyx {
+      <main class="page">
+        <h1>Hello from Hya</h1>
+        <p>This page was rendered on the server.</p>
+      </main>
+    };
+    return hya.html(hya.page("Hello Hya", [body]));
   }
 }
 ```
@@ -103,12 +104,13 @@ require env.read;
 
 group#pages {
   thread#home(map#ctx) {
-    return hya.html(hya.page("Hello Hya", [
-      hya.element("main", { class: "page" }, [
-        hya.element("h1", {}, [hya.text("Hello from Hya")]),
-        hya.element("p", {}, [hya.text("This page was rendered on the server.")])
-      ])
-    ]));
+    var#body = hyx {
+      <main class="page">
+        <h1>Hello from Hya</h1>
+        <p>This page was rendered on the server.</p>
+      </main>
+    };
+    return hya.html(hya.page("Hello Hya", [body]));
   }
 }
 
@@ -174,7 +176,7 @@ A lot of UI frameworks start by teaching reusable components first. Hya works be
 - responses matter as much as nodes
 - assets, JSON endpoints, and HTML pages all belong to the same app surface
 
-That is why our first milestone is “get a real request to a real page handler,” not “learn a special component lifecycle.”
+That is why our first milestone is “get a real request to a real page handler,” not “learn a special component lifecycle.” The only real style change versus the older flat-first docs is the rendering surface we recommend for the page body.
 
 ## Suggested styling next
 

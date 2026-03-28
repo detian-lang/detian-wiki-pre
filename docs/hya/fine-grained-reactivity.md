@@ -40,10 +40,12 @@ Today it includes:
 - direct state text interpolation
 - direct state attr/class/style bindings
 - direct state `if/else`
+- direct `else if` chains
 - keyed text loops
 - keyed HTML-fragment loops
 - keyed component loops
 - indexed keyed loops that need `idx` inside the rendered row
+- default `state.*` alias inside component-style HYX threads
 
 When a pattern is not safe enough, Hya falls back to the legacy render path and records why in `data-hya-fine-diagnostics`.
 
@@ -52,6 +54,8 @@ Useful current fallback reasons include:
 - `complex_state_text_expr`
 - `complex_state_attr_expr`
 - `state_each_requires_keyed_root`
+
+Those diagnostics now also include a `hint`, so the runtime can tell you what to simplify or rewrite when a component stayed on the legacy path.
 
 ## Structural patching and re-hydration
 

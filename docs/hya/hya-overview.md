@@ -57,21 +57,23 @@ That means Hya is already beyond "SSR plus full rerender only" for a meaningful 
 
 ## HYX and fine-grained lowering today
 
-HYX already lowers several safe state-driven patterns automatically:
+HYX is now the preferred authoring surface for most Hya page/component code, and it already lowers several safe state-driven patterns automatically:
 
-- `{props.state.value.count}` → `hya.state_text(...)`
-- `class={props.state.value.variant}` / `style={props.state.value.accent}` / `disabled={props.state.value.busy}`
-- `if (props.state.value.busy) { ... } else { ... }` → `hya.state_when(...)`
+- `{state.count}` → `hya.state_text(...)`
+- `class={state.variant}` / `style={state.accent}` / `disabled={state.busy}`
+- `if (state.busy) { ... } else { ... }` → `hya.state_when(...)`
 - keyed loops such as:
-  - `for item in props.state.value.items { <li key={item.id}>{item.name}</li> }`
-  - `for item in props.state.value.items { <MetricCard key={item.id} metric={item} /> }`
-  - `for item, idx in props.state.value.items { <li key={item.id}>{item.name + "-" + str(idx)}</li> }`
+  - `for item in state.items { <li key={item.id}>{item.name}</li> }`
+  - `for item in state.items { <MetricCard key={item.id} metric={item} /> }`
+  - `for item, idx in state.items { <li key={item.id}>{item.name + "-" + str(idx)}</li> }`
 
 When HYX cannot stay on the fine path, Hya records a fallback reason in `data-hya-fine-diagnostics`, for example:
 
 - `complex_state_text_expr`
 - `complex_state_attr_expr`
 - `state_each_requires_keyed_root`
+
+Those diagnostics now also include `hint`, so you get an explicit suggestion for what to change when a component stays on the legacy path.
 
 ## Dev loop today
 
